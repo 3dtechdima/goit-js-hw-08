@@ -66,7 +66,7 @@ const galleryItems = [
 //назначение переменной списка ul, опращаясь к элементу ul в HTML по классу
 const navItemEl = document.querySelector('ul.js-gallery');
 // функция добавления в HTML список ul пунктов li сшаблонной строкой кода HTML
-const markup = galleryItems.map(({ preview, description, original }) => {
+const markup = galleryItems.map(({ preview, description, original }, index) => {
   return `
   <li class="gallery__item">
       <a
@@ -75,6 +75,7 @@ const markup = galleryItems.map(({ preview, description, original }) => {
       >
         <img
           class="gallery__image"
+          data-index="${index}"
           src="${preview}"
           data-source="${original}"
           alt="${description}"
@@ -90,8 +91,13 @@ const mod = document.querySelector('div.js-lightbox');
 // назначение переменной модального окна, обращаясь к кнопке в HTML по классу
 const imgModRef = document.querySelector('.lightbox__image');
 //
+let activIndexImg = 0;
+
+const galleryItemsLength = galleryItems.length - 1;
+
 function showPopup(e) {
   e.preventDefault();
+  activIndexImg = +e.target.dataset.index;
   if (!e.target.classList.contains('gallery__image')) return;
   mod.classList.add('is-open');
   updateImageSrc(e.target.dataset.source, e.target.getAttribute('alt'));
@@ -118,8 +124,26 @@ function escClose(e) {
   }
 }
 
-//
-function leftImg() {}
+function slider() {
+  const { description, original } = galleryItems[activIndexImg];
+  updateImageSrc(original, description);
+}
+
+//galleryItemsLength
+function leftImg() {
+  activIndexImg -= 1;
+  if (activIndexImg < 0) {
+    activIndexImg = galleryItemsLength;
+  }
+  slider();
+}
+function rightImg() {
+  activIndexImg += 1;
+  if (activIndexImg > galleryItemsLength) {
+    activIndexImg = 0;
+  }
+  slider();
+}
 
 function replacementImg(e) {
   if (e.keyCode === 37) {
